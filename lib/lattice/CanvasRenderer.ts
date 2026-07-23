@@ -1,17 +1,32 @@
 import type { WheelGraph, WheelNode } from "./types";
 import { polarToCartesian, wheelRadiusFor } from "./wheelLayout";
+import { HIVE_ORB_COUNT } from "./generateHive";
 
 const PALETTE = {
-  background: "#f7f8f7",
-  edge: "rgba(20, 32, 27, 0.18)",
-  centerText: "#f7f8f7",
-  personText: "#f7f8f7",
-  hubLabelText: "#14201b",
-  faded: "rgba(20, 32, 27, 0.5)",
+  stageInner: "#1e293b",
+  stageOuter: "#0f172a",
+  wireBase: "rgba(255,255,255,0.05)",
+  wireMid: "rgba(46,125,82,0.35)",
+  wireFlow: "rgba(74,222,128,0.85)",
+  orbFill: "#1e293b",
+  orbBorder: "#334155",
+  orbInitials: "#e2e8f0",
+  orbClosed: "#22c55e",
+  focusRing: "#4ade80",
+  brainText: "#ffffff",
+  brainCaption: "rgba(255,255,255,0.85)",
+  faded: 0.16, // alpha for dimmed (non-focused) orbs/wires
 };
 
-const FADE_ALPHA = 0.12;
-const FADE_NODE_RADIUS = 3;
+const PULSE_MS = 850;
+
+export interface HiveFrame {
+  timeMs: number;
+  revenue: number;
+  pulses: { nodeId: string; startMs: number }[];
+}
+
+const EMPTY_FRAME: HiveFrame = { timeMs: 0, revenue: 0, pulses: [] };
 
 export interface Camera {
   scale: number;
@@ -55,24 +70,15 @@ export function nodePixelPosition(
   return polarToCartesian(centerX, centerY, node.angle, node.radiusFraction * wheelRadius);
 }
 
-// The focused node plus everything directly linked to it stay in full
-// detail; everything else fades to a soft, undetailed shape (see
-// drawFadedNode) instead of just a lower-opacity copy of itself.
 export function neighborIds(graph: WheelGraph, focusedNodeId: string): Set<string> {
   const ids = new Set<string>([focusedNodeId]);
   for (const link of graph.links) {
     if (link.sourceId === focusedNodeId) ids.add(link.targetId);
     if (link.targetId === focusedNodeId) ids.add(link.sourceId);
   }
-  // A lead links only to its hub, so direct neighbours alone leave the frame
-  // almost empty. Keeping the focused node's whole zone lit is what makes a
-  // drill read as "this rep's cluster", which is the point of the shot.
-  const focused = graph.nodes.find((node) => node.id === focusedNodeId);
-  if (focused?.zoneIndex !== undefined) {
-    for (const node of graph.nodes) {
-      if (node.zoneIndex === focused.zoneIndex) ids.add(node.id);
-    }
-  }
+  // Hive: an orb links only to the brain, so this is {orb, brain} on a drill —
+  // exactly the "magnify one conversation" highlight. (No zone-lighting; the
+  // wheel's whole-zone branch was removed with the wheel.)
   return ids;
 }
 
@@ -142,145 +148,169 @@ export class CanvasRenderer {
     this.ctx = context;
   }
 
-  render(graph: WheelGraph, focusedNodeId: string | undefined, camera?: Camera): void {
+  render(
+    graph: WheelGraph,
+    focusedNodeId: string | undefined,
+    camera?: Camera,
+    frame: HiveFrame = EMPTY_FRAME,
+  ): void {
     const { ctx, canvas } = this;
     const width = canvas.width;
     const height = canvas.height;
     const activeCamera = camera ?? identityCamera(width, height);
-    // Drives the dim/highlight crossfade. This used to derive from how far
-    // the (eased) camera had zoomed toward FOCUS_ZOOM, but the drill camera
-    // now pans aside at a constant scale of 1 instead of zooming, so scale no
-    // longer carries any focus signal — key it off focusedNodeId directly.
-    const focusStrength = focusedNodeId !== undefined ? 1 : 0;
+    const focused = focusedNodeId !== undefined;
 
-    ctx.fillStyle = PALETTE.background;
+    // Dark stage + soft radial vignette (pre-camera, fills the whole canvas).
+    const vignette = ctx.createRadialGradient(
+      width / 2, height / 2, Math.min(width, height) * 0.1,
+      width / 2, height / 2, Math.max(width, height) * 0.7,
+    );
+    vignette.addColorStop(0, PALETTE.stageInner);
+    vignette.addColorStop(1, PALETTE.stageOuter);
+    ctx.fillStyle = vignette;
     ctx.fillRect(0, 0, width, height);
 
     const positionById = new Map(
       graph.nodes.map((node) => [node.id, nodePixelPosition(node, width, height)]),
     );
-    const focusedIds = focusedNodeId ? neighborIds(graph, focusedNodeId) : undefined;
+    const litIds = focusedNodeId ? neighborIds(graph, focusedNodeId) : undefined;
 
     ctx.save();
     ctx.translate(width / 2, height / 2);
     ctx.scale(activeCamera.scale, activeCamera.scale);
     ctx.translate(-activeCamera.lookAtX, -activeCamera.lookAtY);
 
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = PALETTE.edge;
+    // Wires (brain → orb). Lit wire glows and flows; others dim.
     for (const link of graph.links) {
-      const source = positionById.get(link.sourceId);
-      const target = positionById.get(link.targetId);
-      if (!source || !target) continue;
-      const isNeighborLink = !focusedIds || (focusedIds.has(link.sourceId) && focusedIds.has(link.targetId));
-      ctx.globalAlpha = isNeighborLink ? 1 : 1 - focusStrength;
-      if (ctx.globalAlpha <= 0) continue;
-      ctx.beginPath();
-      ctx.moveTo(source.x, source.y);
-      ctx.lineTo(target.x, target.y);
-      ctx.stroke();
-    }
-
-    for (const node of graph.nodes) {
-      const position = positionById.get(node.id);
-      if (!position) continue;
-      const isNeighbor = !focusedIds || focusedIds.has(node.id);
-      if (isNeighbor) {
-        ctx.globalAlpha = 1;
-        this.drawNode(node, position);
-      } else {
-        // Crossfade: full detail fades out as the camera zooms in, while
-        // the soft faded dot fades in at the same rate.
-        ctx.globalAlpha = 1 - focusStrength;
-        this.drawNode(node, position);
-        this.drawFadedNode(position, focusStrength);
+      const a = positionById.get(link.sourceId);
+      const b = positionById.get(link.targetId);
+      if (!a || !b) continue;
+      const isLit = !litIds || (litIds.has(link.sourceId) && litIds.has(link.targetId));
+      ctx.globalAlpha = isLit ? 1 : PALETTE.faded;
+      // base + mid
+      ctx.strokeStyle = PALETTE.wireBase;
+      ctx.lineWidth = 6;
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      ctx.strokeStyle = PALETTE.wireMid;
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      // animated flow dashes on lit wires
+      if (isLit) {
+        ctx.save();
+        ctx.strokeStyle = PALETTE.wireFlow;
+        ctx.lineWidth = 3;
+        ctx.lineCap = "round";
+        ctx.setLineDash([14, 26]);
+        ctx.lineDashOffset = -(frame.timeMs / 22) % 40;
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        ctx.restore();
       }
     }
     ctx.globalAlpha = 1;
+
+    // Sale pulses: a bright dot travels orb → brain along its wire.
+    for (const pulse of frame.pulses) {
+      const orb = positionById.get(pulse.nodeId);
+      const brain = positionById.get("center");
+      if (!orb || !brain) continue;
+      const p = (frame.timeMs - pulse.startMs) / PULSE_MS;
+      if (p < 0 || p > 1) continue;
+      const x = orb.x + (brain.x - orb.x) * p;
+      const y = orb.y + (brain.y - orb.y) * p;
+      ctx.fillStyle = PALETTE.wireFlow;
+      ctx.shadowColor = PALETTE.wireFlow;
+      ctx.shadowBlur = 16;
+      ctx.beginPath(); ctx.arc(x, y, 7 * (1 - p) + 3, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    // Orbs, then the brain on top.
+    for (const node of graph.nodes) {
+      if (node.ring === "center") continue;
+      const pos = positionById.get(node.id);
+      if (!pos) continue;
+      const isLit = !litIds || litIds.has(node.id);
+      ctx.globalAlpha = focused && !isLit ? PALETTE.faded : 1;
+      this.drawOrb(node, pos, isLit && focused);
+    }
+    ctx.globalAlpha = 1;
+
+    const brain = graph.nodes.find((n) => n.ring === "center");
+    if (brain) {
+      const pos = positionById.get(brain.id)!;
+      this.drawBrain(brain, pos, frame);
+    }
+
     ctx.restore();
   }
 
-  private drawFadedNode(position: { x: number; y: number }, focusStrength: number): void {
+  private drawOrb(
+    node: WheelNode,
+    pos: { x: number; y: number },
+    highlighted: boolean,
+  ): void {
     const { ctx } = this;
-    ctx.globalAlpha = FADE_ALPHA * focusStrength;
-    ctx.fillStyle = PALETTE.faded;
+    const isClosed = node.closed === true;
+    if (highlighted) {
+      ctx.shadowColor = PALETTE.focusRing;
+      ctx.shadowBlur = 22;
+    }
+    ctx.fillStyle = isClosed ? PALETTE.orbClosed : PALETTE.orbFill;
     ctx.beginPath();
-    ctx.arc(position.x, position.y, FADE_NODE_RADIUS, 0, Math.PI * 2);
+    ctx.arc(pos.x, pos.y, node.radius, 0, Math.PI * 2);
     ctx.fill();
-    ctx.globalAlpha = 1;
-  }
-
-  private drawNode(node: WheelNode, position: { x: number; y: number }): void {
-    const { ctx } = this;
-
-    if (node.ring === "center") {
-      const size = node.radius * 2;
-      ctx.fillStyle = node.color;
-      ctx.beginPath();
-      if (typeof ctx.roundRect === "function") {
-        ctx.roundRect(position.x - node.radius, position.y - node.radius, size, size, 4);
-      } else {
-        ctx.rect(position.x - node.radius, position.y - node.radius, size, size);
-      }
-      ctx.fill();
-      ctx.fillStyle = PALETTE.centerText;
-      ctx.font = "12px Inter, ui-sans-serif, system-ui, sans-serif";
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = highlighted || isClosed ? PALETTE.focusRing : PALETTE.orbBorder;
+    ctx.stroke();
+    if (node.initials) {
+      ctx.fillStyle = PALETTE.orbInitials;
+      ctx.font = `600 ${Math.round(node.radius * 0.8)}px Inter, ui-sans-serif, system-ui, sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText("K", position.x, position.y);
-      return;
+      ctx.fillText(node.initials, pos.x, pos.y);
     }
+  }
 
-    if (node.ring === "icon") {
-      const size = node.radius * 2;
-      ctx.fillStyle = node.color;
-      ctx.beginPath();
-      if (typeof ctx.roundRect === "function") {
-        ctx.roundRect(position.x - node.radius, position.y - node.radius, size, size, 3);
-      } else {
-        ctx.rect(position.x - node.radius, position.y - node.radius, size, size);
-      }
-      ctx.fill();
-      return;
-    }
+  private drawBrain(
+    node: WheelNode,
+    pos: { x: number; y: number },
+    frame: HiveFrame,
+  ): void {
+    const { ctx } = this;
+    // Subtle bump if a pulse landed in the brain very recently.
+    const recent = frame.pulses.reduce(
+      (m, p) => Math.max(m, 1 - Math.min(1, (frame.timeMs - p.startMs - PULSE_MS) / 250)),
+      0,
+    );
+    const bump = recent > 0 && recent <= 1 ? 1 + 0.05 * recent : 1;
+    const r = node.radius * bump;
 
-    if (node.ring === "hub" || node.ring === "avatar") {
-      // Only lead (avatar) nodes ever turn green when closed — hubs are
-      // sales reps, not leads, so this stays scoped to avatars even though
-      // `closed` isn't otherwise restricted to that ring.
-      const isClosedLead = node.ring === "avatar" && node.closed === true;
-      ctx.fillStyle = isClosedLead ? "#1f9d55" : node.color;
-      ctx.beginPath();
-      ctx.arc(position.x, position.y, node.radius, 0, Math.PI * 2);
-      ctx.fill();
-      if (node.initials) {
-        ctx.fillStyle = PALETTE.personText;
-        ctx.font = `${Math.max(6, node.radius)}px Inter, ui-sans-serif, system-ui, sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(node.initials, position.x, position.y);
-      }
-      if (node.ring === "hub" && node.label) {
-        // Hubs sit close together on a small inner ring, so a label drawn
-        // straight below every hub collides with its neighbors. Push each
-        // label outward along its own hub's angle instead, fanning the 6
-        // labels apart in 6 different directions.
-        const labelOffset = node.radius + 14;
-        const labelX = position.x + Math.cos(node.angle) * labelOffset;
-        const labelY = position.y + Math.sin(node.angle) * labelOffset;
-        ctx.fillStyle = PALETTE.hubLabelText;
-        ctx.font = "12px Inter, ui-sans-serif, system-ui, sans-serif";
-        ctx.textAlign = Math.cos(node.angle) >= 0 ? "left" : "right";
-        ctx.textBaseline = "middle";
-        ctx.fillText(node.label, labelX, labelY);
-      }
-      return;
-    }
-
-    ctx.fillStyle = node.color;
+    const grad = ctx.createRadialGradient(
+      pos.x - r * 0.3, pos.y - r * 0.3, r * 0.1, pos.x, pos.y, r,
+    );
+    grad.addColorStop(0, "#4ade80");
+    grad.addColorStop(0.6, "#166534");
+    grad.addColorStop(1, "#064e3b");
+    ctx.shadowColor = "rgba(74,222,128,0.45)";
+    ctx.shadowBlur = 60;
+    ctx.fillStyle = grad;
     ctx.beginPath();
-    ctx.arc(position.x, position.y, node.radius, 0, Math.PI * 2);
+    ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
     ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = PALETTE.brainCaption;
+    ctx.font = "600 18px Inter, ui-sans-serif, system-ui, sans-serif";
+    ctx.fillText("TOTAL REVENUE", pos.x, pos.y - 46);
+    ctx.fillStyle = PALETTE.brainText;
+    ctx.font = "600 64px Inter, ui-sans-serif, system-ui, sans-serif";
+    ctx.fillText(`$${Math.round(frame.revenue).toLocaleString()}`, pos.x, pos.y + 6);
+    ctx.fillStyle = PALETTE.brainCaption;
+    ctx.font = "600 15px Inter, ui-sans-serif, system-ui, sans-serif";
+    ctx.fillText(`1 AI Brain • ${HIVE_ORB_COUNT} Chats`, pos.x, pos.y + 54);
   }
 
   resize(width: number, height: number): void {

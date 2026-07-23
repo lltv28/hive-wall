@@ -86,51 +86,22 @@ describe("neighborIds", () => {
     expect(ids).toEqual(new Set(["icon-0-0", "hub-0"]));
   });
 
-  it("keeps a focused avatar's whole zone lit, not just its direct hub link", () => {
-    const avatar0a: WheelNode = {
-      id: "avatar-0-a",
-      ring: "avatar",
-      zoneIndex: 0,
-      angle: 0.2,
-      radiusFraction: 0.9,
-      radius: 4,
-      color: "#2f6df6",
-    };
-    const avatar0b: WheelNode = {
-      id: "avatar-0-b",
-      ring: "avatar",
-      zoneIndex: 0,
-      angle: 0.3,
-      radiusFraction: 0.9,
-      radius: 4,
-      color: "#2f6df6",
-    };
-    const avatar1: WheelNode = {
-      id: "avatar-1-a",
-      ring: "avatar",
-      zoneIndex: 1,
-      angle: 1.2,
-      radiusFraction: 0.9,
-      radius: 4,
-      color: "#1f9d55",
-    };
-    const zonedGraph: WheelGraph = {
-      nodes: [center, hub0, icon0, hub1, avatar0a, avatar0b, avatar1],
-      links: [
-        ...graph.links,
-        { id: "l3", sourceId: "hub-0", targetId: "avatar-0-a" },
-        { id: "l4", sourceId: "hub-0", targetId: "avatar-0-b" },
-        { id: "l5", sourceId: "hub-1", targetId: "avatar-1-a" },
+  it("lights a focused orb and the brain only (orbs link to the brain alone)", () => {
+    const graph = {
+      nodes: [
+        { id: "center", ring: "center", angle: 0, radiusFraction: 0, radius: 150, color: "#0b3b28" },
+        { id: "orb-0", ring: "avatar", angle: 0, radiusFraction: 0.6, radius: 16, color: "#1e293b", zoneIndex: 0 },
+        { id: "orb-1", ring: "avatar", angle: 0.2, radiusFraction: 0.86, radius: 16, color: "#1e293b", zoneIndex: 0 },
       ],
-    };
-
-    const ids = neighborIds(zonedGraph, "avatar-0-a");
-    // The focused avatar's own hub and every sibling avatar in its zone stay lit...
-    expect(ids.has("hub-0")).toBe(true);
-    expect(ids.has("avatar-0-b")).toBe(true);
-    // ...but nothing from a different rep's zone does.
-    expect(ids.has("hub-1")).toBe(false);
-    expect(ids.has("avatar-1-a")).toBe(false);
+      links: [
+        { id: "l0", sourceId: "center", targetId: "orb-0" },
+        { id: "l1", sourceId: "center", targetId: "orb-1" },
+      ],
+    } as const;
+    const ids = neighborIds(graph as never, "orb-0");
+    expect(ids.has("orb-0")).toBe(true);
+    expect(ids.has("center")).toBe(true);
+    expect(ids.has("orb-1")).toBe(false); // same zone as orb-0, but must NOT be lit
   });
 });
 
@@ -269,6 +240,12 @@ describe("closed-state fill", () => {
       fill: () => {
         fillCalls.push(ctx.fillStyle as string);
       },
+      createRadialGradient: () => ({ addColorStop: () => {} }),
+      setLineDash: () => {},
+      lineDashOffset: 0,
+      lineCap: "butt",
+      shadowBlur: 0,
+      shadowColor: "",
     } as unknown as CanvasRenderingContext2D;
     return { ctx, fillCalls };
   }
@@ -294,22 +271,15 @@ describe("closed-state fill", () => {
       closed: true,
     };
     const fillCalls = renderWithFillTracking({ nodes: [avatar], links: [] });
-    expect(fillCalls).toEqual(["#1f9d55"]);
+    expect(fillCalls).toEqual(["#22c55e"]);
   });
 
-  it("does not render a hub node green even when it carries closed: true", () => {
-    const hub: WheelNode = {
-      id: "hub-0",
-      ring: "hub",
-      zoneIndex: 0,
-      angle: 0,
-      radiusFraction: 0.22,
-      radius: 16,
-      color: "#2f6df6",
-      closed: true,
+  it("never fills the brain with the flat closed color", () => {
+    const brain: WheelNode = {
+      id: "center", ring: "center", angle: 0, radiusFraction: 0, radius: 150, color: "#0b3b28",
     };
-    const fillCalls = renderWithFillTracking({ nodes: [hub], links: [] });
-    expect(fillCalls).toEqual(["#2f6df6"]);
+    const fillCalls = renderWithFillTracking({ nodes: [brain], links: [] });
+    expect(fillCalls).not.toContain("#22c55e"); // brain draws a gradient, not the closed color
   });
 });
 
@@ -344,11 +314,17 @@ describe("focus dimming", () => {
       fillRect: () => {},
       fillText: () => {},
       fill: () => {},
+      createRadialGradient: () => ({ addColorStop: () => {} }),
+      setLineDash: () => {},
+      lineDashOffset: 0,
+      lineCap: "butt",
+      shadowBlur: 0,
+      shadowColor: "",
     } as unknown as CanvasRenderingContext2D;
     return { ctx, arcAlphas };
   }
 
-  it("dims a non-neighbor node to zero alpha once a node is focused, even at scale 1", () => {
+  it("dims a non-neighbor orb once a node is focused, even at scale 1", () => {
     const focused: WheelNode = {
       id: "focused",
       ring: "avatar",
@@ -378,11 +354,11 @@ describe("focus dimming", () => {
       { scale: 1, lookAtX: 400, lookAtY: 300 },
     );
 
-    // "other" is not in focused's neighbor set, so its full-detail arc draws
-    // at 1 - focusStrength. If dimming still depended on camera.scale (which
-    // never leaves 1 for either wide/pullback or a drill now), this would be
-    // 1 (never dimmed) instead of 0.
-    expect(arcAlphas).toContain(0);
+    // "other" is not in focused's neighbor set, so its arc draws at
+    // PALETTE.faded (0.16) rather than full opacity. If dimming still
+    // depended on camera.scale (which never leaves 1 for either
+    // wide/pullback or a drill now), this would be 1 (never dimmed) instead.
+    expect(arcAlphas.some((a) => a > 0 && a < 0.2)).toBe(true);
   });
 
   it("does not dim anything when no node is focused", () => {
@@ -402,6 +378,6 @@ describe("focus dimming", () => {
 
     new CanvasRenderer(canvas).render({ nodes: [solo], links: [] }, undefined);
 
-    expect(arcAlphas).toEqual([1]);
+    expect(arcAlphas.every((a) => a === 1)).toBe(true);
   });
 });

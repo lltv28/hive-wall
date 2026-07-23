@@ -12,6 +12,7 @@ import {
   worldToScreen,
   type Camera,
   type CardSide,
+  type HiveFrame,
 } from "./CanvasRenderer";
 
 export type VaultAction = "regenerate" | "pause" | "fullscreen" | "hide";
@@ -55,6 +56,9 @@ export function createVisualizerApp(
   // zooming out, and panning directly between two focused nodes are all just
   // "ease toward the current target", with no separate instant-snap cases.
   let camera: Camera = identityCamera(1, 1);
+  // eslint-disable-next-line prefer-const -- Task 4 adds setBrainRevenue, which reassigns this.
+  let brainRevenue = 0;
+  let pulses: { nodeId: string; startMs: number }[] = [];
 
   const initialWidth = root.clientWidth || window.innerWidth;
   const initialHeight = root.clientHeight || window.innerHeight;
@@ -129,7 +133,10 @@ export function createVisualizerApp(
   }
 
   function renderNow(): void {
-    renderer.render(visibleGraph(), focusedNodeId, camera);
+    const now = performance.now();
+    pulses = pulses.filter((p) => now - p.startMs < 1200); // prune finished pulses
+    const frame: HiveFrame = { timeMs: now, revenue: brainRevenue, pulses };
+    renderer.render(visibleGraph(), focusedNodeId, camera, frame);
   }
 
   function startGraph(): void {
@@ -280,8 +287,6 @@ export function createVisualizerApp(
     const deltaMs = now - lastFrameTimeMs;
     lastFrameTimeMs = now;
 
-    let changed = false;
-
     if (!paused && growthSchedule) {
       growthElapsedSeconds += deltaMs / 1000;
       while (
@@ -291,7 +296,6 @@ export function createVisualizerApp(
         const batch = growthSchedule[nextGrowthBatchIndex]!;
         for (const node of batch.nodes) revealedIds.add(node.id);
         nextGrowthBatchIndex += 1;
-        changed = true;
       }
     }
 
@@ -307,13 +311,13 @@ export function createVisualizerApp(
         lookAtX: camera.lookAtX + (target.lookAtX - camera.lookAtX) * ease,
         lookAtY: camera.lookAtY + (target.lookAtY - camera.lookAtY) * ease,
       };
-      changed = true;
     } else if (remaining > 0) {
       camera = target;
-      changed = true;
     }
 
-    if (changed) renderNow();
+    // The Hive animates every frame (wire flow, brain pulse) regardless of
+    // camera state, so redraw unconditionally instead of gating on `changed`.
+    renderNow();
     animationFrame = requestAnimationFrame(frame);
   }
   animationFrame = requestAnimationFrame(frame);
