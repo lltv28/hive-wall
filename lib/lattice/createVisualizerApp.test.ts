@@ -253,4 +253,21 @@ describe("createVisualizerApp", () => {
 
     app.destroy();
   });
+
+  it("fires a pulse for a closed orb, visible in the next render frame", () => {
+    const root = document.createElement("div");
+    let lastFrame: { pulses: { nodeId: string }[] } | undefined;
+    const app = createVisualizerApp(root, {
+      rendererFactory: () => ({
+        render: (_g, _f, _c, frame) => { lastFrame = frame as typeof lastFrame; },
+        resize: vi.fn(),
+      }),
+    });
+    const orb = app.getLeadNodes()[0]!;
+    app.setBrainRevenue(0); // force a renderNow via the public path
+    app.markClosed(orb.id);
+    // markClosed calls renderNow synchronously (see impl), so lastFrame is fresh.
+    expect(lastFrame?.pulses.some((p) => p.nodeId === orb.id)).toBe(true);
+    app.destroy();
+  });
 });

@@ -354,6 +354,7 @@ export function createVisualizerApp(
     const node = graph.nodes.find((candidate) => candidate.id === nodeId);
     if (!node) return;
     node.closed = true;
+    pulses = [...pulses, { nodeId, startMs: performance.now() }];
     renderNow();
   }
 
