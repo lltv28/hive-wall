@@ -1,15 +1,15 @@
-import { C, R, TYPE, W, useCountUp } from '@/lib/adStage';
+import { TYPE, W } from '@/lib/adStage';
+import { RAIL } from './railTheme';
 
-export function RevenueHero({ amount }: { amount: number }) {
-  const shown = useCountUp(amount);
+export function RevenueHero({ caption, value }: { caption: string; value: string }) {
   return (
     <div
       style={{
-        background: C.card,
-        border: `1px solid ${C.border}`,
-        borderRadius: R.lg,
+        background: RAIL.panel,
+        border: `1px solid ${RAIL.border}`,
+        borderRadius: RAIL.radius,
         padding: '22px 24px',
-        boxShadow: C.cardShadow,
+        boxShadow: RAIL.shadow,
         fontFamily: 'inherit',
       }}
     >
@@ -19,15 +19,15 @@ export function RevenueHero({ amount }: { amount: number }) {
           fontWeight: W.medium,
           letterSpacing: '2px',
           textTransform: 'uppercase',
-          color: C.muted,
+          color: RAIL.muted,
         }}
       >
-        Revenue · Today
+        {caption}
       </div>
-      <div style={{ fontSize: '64px', fontWeight: W.semibold, color: C.green, lineHeight: 1.1 }}>
-        {`$${Math.round(shown).toLocaleString()}`}
+      <div style={{ fontSize: '64px', fontWeight: W.semibold, color: RAIL.green, lineHeight: 1.1 }}>
+        {value}
       </div>
-      <div style={{ fontSize: `${TYPE.xs}px`, color: C.muted, fontWeight: W.normal }}>
+      <div style={{ fontSize: `${TYPE.xs}px`, color: RAIL.muted, fontWeight: W.normal }}>
         Updating live
       </div>
     </div>

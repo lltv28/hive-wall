@@ -1,14 +1,15 @@
-import { C, R, TYPE, W, type FeedEvent } from '@/lib/adStage';
+import { TYPE, W, type FeedEvent } from '@/lib/adStage';
+import { RAIL } from './railTheme';
 
 export function Ticker({ feed }: { feed: FeedEvent[] }) {
   return (
     <div
       style={{
-        background: C.card,
-        border: `1px solid ${C.border}`,
-        borderRadius: R.lg,
+        background: RAIL.panel,
+        border: `1px solid ${RAIL.border}`,
+        borderRadius: RAIL.radius,
         padding: '18px 20px',
-        boxShadow: C.cardShadow,
+        boxShadow: RAIL.shadow,
         flex: 1,
         overflow: 'hidden',
         fontFamily: 'inherit',
@@ -20,7 +21,7 @@ export function Ticker({ feed }: { feed: FeedEvent[] }) {
           fontWeight: W.medium,
           letterSpacing: '1px',
           textTransform: 'uppercase',
-          color: C.muted,
+          color: RAIL.muted,
           marginBottom: '12px',
         }}
       >
@@ -38,8 +39,8 @@ export function Ticker({ feed }: { feed: FeedEvent[] }) {
             fontWeight: W.medium,
           }}
         >
-          <span style={{ color: C.ink }}>{`Lead ${event.leadNo}`}</span>
-          <span style={{ color: event.outcome === 'buy' ? C.green : C.slate }}>
+          <span style={{ color: RAIL.ink }}>{`Lead ${event.leadNo}`}</span>
+          <span style={{ color: event.outcome === 'buy' ? RAIL.green : RAIL.slate }}>
             {event.outcome === 'buy' ? `bought · $${event.valueUsd}` : 'booked a call'}
           </span>
         </div>

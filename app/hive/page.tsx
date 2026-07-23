@@ -65,7 +65,7 @@ const CARD_OPEN_DELAY_MS = 2_000;
 
 export default function LatticePage() {
   const fit = useFitStage();
-  useRecordingChrome('#eef1f5');
+  useRecordingChrome('#0f172a');
   const { tally, feed } = useLiveTally({
     baseRevenue: BASE_REVENUE,
     basePurchases: BASE_PURCHASES,
@@ -251,12 +251,11 @@ export default function LatticePage() {
           display: 'flex',
           flexDirection: 'row',
           gap: `${COL_GAP}px`,
-          background: 'linear-gradient(160deg, #ffffff 0%, #f1f5f9 100%)',
+          background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%)',
           position: 'relative',
         }}
       >
         <ScoreboardRail
-          revenue={tally.revenue}
           purchases={tally.purchases}
           calls={tally.calls}
           upsellPct={UPSELL_PCT}

@@ -1,18 +1,17 @@
-import { C, TYPE, W, type FeedEvent } from '@/lib/adStage';
+import { TYPE, W, type FeedEvent } from '@/lib/adStage';
+import { RAIL } from './railTheme';
 import { LiveRangeSelect } from './LiveRangeSelect';
 import { MiniStat } from './MiniStat';
 import { RevenueHero } from './RevenueHero';
 import { Ticker } from './Ticker';
 
 export function ScoreboardRail({
-  revenue,
   purchases,
   calls,
   upsellPct,
   feed,
   width,
 }: {
-  revenue: number;
   purchases: number;
   calls: number;
   upsellPct: number;
@@ -35,7 +34,7 @@ export function ScoreboardRail({
         <LiveRangeSelect />
         <span
           style={{
-            color: C.green,
+            color: RAIL.green,
             fontSize: `${TYPE.sm}px`,
             fontWeight: W.semibold,
             letterSpacing: '2px',
@@ -46,10 +45,9 @@ export function ScoreboardRail({
         </span>
       </div>
 
-      <RevenueHero amount={revenue} />
+      <RevenueHero caption="Purchases · Today" value={purchases.toLocaleString()} />
 
       <div style={{ display: 'flex', gap: '12px' }}>
-        <MiniStat label="Purchases" value={purchases.toLocaleString()} />
         <MiniStat label="Calls" value={calls.toLocaleString()} />
         <MiniStat label="Upsell %" value={`${upsellPct}%`} />
       </div>
