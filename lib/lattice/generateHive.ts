@@ -11,9 +11,11 @@ const ORB_COLOR = "#1e293b";
 const BRAIN_COLOR = "#0b3b28";
 
 // Each side fans ±ARC_HALF_SPAN around its axis (0 rad right, π rad left).
-// 70° keeps every orb's cos() sign unambiguous, so focusSideFor (which keys
-// off pixel x vs center) never mis-assigns a near-vertical orb.
-const ARC_HALF_SPAN = (70 * Math.PI) / 180;
+// 48° gives two distinct left/right arcs with clear open space top and bottom
+// (rather than a near-full ring), and keeps every orb well clear of ±90° so its
+// cos() sign stays unambiguous — focusSideFor (pixel x vs center) never
+// mis-assigns a near-vertical orb.
+const ARC_HALF_SPAN = (48 * Math.PI) / 180;
 // Two depths per arc give the cluster body instead of a single thin curve.
 const RADIUS_NEAR = 0.6;
 const RADIUS_FAR = 0.86;
