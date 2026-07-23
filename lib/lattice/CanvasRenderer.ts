@@ -32,6 +32,17 @@ function setLetterSpacing(ctx: CanvasRenderingContext2D, value: string): void {
   }
 }
 
+// ms for one ambient orb→brain dot traversal along a wire.
+const WIRE_PULSE_MS = 2600;
+
+// Stable phase in [0,1) from a wire id, so each wire's ambient dot is offset
+// and they don't all pulse in lockstep.
+function unitPhase(id: string): number {
+  let h = 0;
+  for (let i = 0; i < id.length; i += 1) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return (h % 997) / 997;
+}
+
 export interface HiveFrame {
   timeMs: number;
   revenue: number;
@@ -206,15 +217,24 @@ export class CanvasRenderer {
       ctx.strokeStyle = PALETTE.wireMid;
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-      // animated flow dashes on lit wires
+      // Ambient "data pulse": a soft glowing dot glides orb → brain on a loop,
+      // staggered per wire, instead of marching dashes — reads as conversations
+      // feeding the brain. (The brighter sale pulse below still pops on a real
+      // close.) p = 0 at the orb (b), 1 at the brain (a); fade in/out at both
+      // ends so dots appear and vanish softly rather than blinking on.
       if (isLit) {
+        const p = ((frame.timeMs / WIRE_PULSE_MS) + unitPhase(link.id)) % 1;
+        const dx = b.x + (a.x - b.x) * p;
+        const dy = b.y + (a.y - b.y) * p;
+        const fade = Math.min(1, Math.min(p, 1 - p) * 5);
         ctx.save();
-        ctx.strokeStyle = PALETTE.wireFlow;
-        ctx.lineWidth = 3;
-        ctx.lineCap = "round";
-        ctx.setLineDash([14, 26]);
-        ctx.lineDashOffset = -(frame.timeMs / 22) % 40;
-        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        ctx.globalAlpha = 0.9 * fade;
+        ctx.fillStyle = PALETTE.wireFlow;
+        ctx.shadowColor = PALETTE.wireFlow;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(dx, dy, 3.2, 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
       }
     }

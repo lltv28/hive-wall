@@ -7,12 +7,13 @@ import { buildLeadIdentities } from '@/lib/lattice/leads';
 
 export const CARD_SIZE = { width: 420, height: 560 };
 
-// Low-alpha ink rather than C.border: the wheel's background (#f7f8f7) and
-// C.border (#e5e5e8) are too close in value for a 1px border-colored line to
-// read against it. Ink at low alpha stays visible on that background without
-// competing with the wheel's own edge/node colors.
-const CONNECTOR_COLOR = 'rgba(26, 26, 26, 0.35)';
-const CONNECTOR_DOT_RADIUS = 3.5;
+// The Hive stage is DARK, so the connector is a soft green-white line with a
+// faint green glow (a wider low-alpha line drawn behind the crisp one). The old
+// low-alpha dark ink was tuned for lattice-wall's light background and vanished
+// on this dark stage. It reads as the "magnifier" link from the orb to the card.
+const CONNECTOR_COLOR = 'rgba(190, 255, 215, 0.7)';
+const CONNECTOR_GLOW = 'rgba(74, 222, 128, 0.3)';
+const CONNECTOR_DOT_RADIUS = 4;
 
 const IDENTITIES = buildLeadIdentities();
 // speed: 3. Nearly every step of the quiz flow gates on waitingForInput, so
@@ -179,8 +180,24 @@ export function QuizCard({
             y1={nodePosition.y}
             x2={cardEdgeX}
             y2={cardEdgeY}
+            stroke={CONNECTOR_GLOW}
+            strokeWidth={4}
+            strokeLinecap="round"
+          />
+          <line
+            x1={nodePosition.x}
+            y1={nodePosition.y}
+            x2={cardEdgeX}
+            y2={cardEdgeY}
             stroke={CONNECTOR_COLOR}
-            strokeWidth={1}
+            strokeWidth={1.5}
+            strokeLinecap="round"
+          />
+          <circle
+            cx={nodePosition.x}
+            cy={nodePosition.y}
+            r={CONNECTOR_DOT_RADIUS + 3}
+            fill={CONNECTOR_GLOW}
           />
           <circle
             cx={nodePosition.x}
