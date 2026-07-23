@@ -1,0 +1,161 @@
+{
+  "flow": [],
+  "questions": [],
+  "callouts": [],
+  "fitScores": [],
+  "milestones": [],
+  "actionPlan": [
+    {
+      "id": "connect-knowledge",
+      "title": "Connect Your Knowledge",
+      "type": "quick",
+      "subtitle": "Your content & expertise — imported",
+      "initialStatus": "completed",
+      "estimatedTime": "done"
+    },
+    {
+      "id": "train-ai",
+      "title": "Train Your AI",
+      "type": "guided",
+      "subtitle": "Turn your expertise into an AI that sells",
+      "initialStatus": "active",
+      "estimatedTime": "3 min",
+      "messages": [
+        {
+          "id": "train-1",
+          "sender": "ai",
+          "content": "Your AI is learning from everything you've uploaded — your calls, docs, and frameworks. Here's what it's picked up so far."
+        },
+        {
+          "id": "train-2",
+          "sender": "ai",
+          "video": { "src": "/teaching-video.mp4", "title": "How your AI learns your voice", "duration": "1:48" }
+        },
+        {
+          "id": "train-3",
+          "sender": "ai",
+          "content": "I've mapped your core method into a knowledge base your AI can use on every conversation.",
+          "visualCard": {
+            "icon": "🧠",
+            "title": "Your AI Brain",
+            "items": [
+              { "label": "Frameworks learned", "value": "42" },
+              { "label": "Voice match", "value": "96%" },
+              { "label": "Source material", "value": "11 hrs of calls" },
+              { "label": "Status", "value": "Ready to sell" }
+            ]
+          }
+        },
+        {
+          "id": "train-4",
+          "sender": "ai",
+          "content": "Want me to fine-tune how it handles pricing questions?",
+          "waitForInput": true
+        }
+      ]
+    },
+    {
+      "id": "customize-ai",
+      "title": "Customize Your AI",
+      "type": "guided",
+      "subtitle": "Set its tone, offer, and guardrails",
+      "initialStatus": "locked",
+      "estimatedTime": "4 min",
+      "messages": [
+        {
+          "id": "cust-1",
+          "sender": "ai",
+          "content": "Let's dial in how your AI shows up. I'll draft a setup from your brand — you can tweak anything."
+        },
+        {
+          "id": "cust-2",
+          "sender": "ai",
+          "content": "What tone should it use with new leads?",
+          "chips": [
+            { "label": "Warm & friendly", "value": "warm" },
+            { "label": "Direct & expert", "value": "direct" },
+            { "label": "Playful", "value": "playful" }
+          ],
+          "waitForInput": true
+        },
+        {
+          "id": "cust-3",
+          "sender": "ai",
+          "content": "Here's your AI's configuration. This is what every prospect experiences, 24/7.",
+          "visualCard": {
+            "icon": "⚙️",
+            "title": "Your AI Setup",
+            "items": [
+              { "label": "Personality", "value": "Warm, direct, expert" },
+              { "label": "Core offer", "value": "Your signature program" },
+              { "label": "Handles", "value": "Objections, pricing, booking" },
+              { "label": "Escalates to you", "value": "Only hot leads" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "go-live",
+      "title": "Go Live",
+      "type": "quick",
+      "subtitle": "Publish your AI to your audience",
+      "initialStatus": "locked",
+      "estimatedTime": "1 min"
+    },
+    {
+      "id": "strategy-call",
+      "title": "Book a 1:1 Strategy Call",
+      "type": "offer",
+      "subtitle": "Have a strategist review your AI setup",
+      "initialStatus": "active",
+      "offerCta": "Book My Call",
+      "offerUrl": "#strategy-call"
+    },
+    {
+      "id": "weekly-results",
+      "title": "This Week's Results",
+      "type": "guided",
+      "subtitle": "See what your AI did while you slept",
+      "initialStatus": "locked",
+      "estimatedTime": "2 min",
+      "messages": [
+        {
+          "id": "res-1",
+          "sender": "ai",
+          "content": "Here's your AI's first week. It handled every conversation so you didn't have to."
+        },
+        {
+          "id": "res-2",
+          "sender": "ai",
+          "content": "These are real numbers from your live AI.",
+          "visualCard": {
+            "icon": "📈",
+            "title": "This Week",
+            "items": [
+              { "label": "Conversations handled", "value": "318" },
+              { "label": "Calls booked", "value": "24" },
+              { "label": "Sales closed", "value": "9" },
+              { "label": "Your hours saved", "value": "37 hrs" }
+            ]
+          }
+        },
+        {
+          "id": "res-3",
+          "sender": "ai",
+          "content": "Next week I'll test a new opener to lift your booking rate. I'll report back here."
+        }
+      ]
+    },
+    {
+      "id": "upgrade-dfy",
+      "title": "Upgrade to Done-For-You",
+      "type": "offer",
+      "subtitle": "Let our team build & optimize your AI",
+      "initialStatus": "active",
+      "offerCta": "Get Started — $497",
+      "offerUrl": "#dfy",
+      "offerPrice": "$497"
+    }
+  ]
+}

@@ -1,0 +1,201 @@
+@import "tailwindcss";
+
+:root {
+  /* Base */
+  --b-w-white: #ffffff;
+
+  /* Text base */
+  --text-rgb: 26, 26, 26;
+  --alpha-light-25: rgba(var(--text-rgb), 0.04);
+  --alpha-light-50: rgba(var(--text-rgb), 0.06);
+  --alpha-light-100: rgba(var(--text-rgb), 0.09);
+  --alpha-light-200: rgba(var(--text-rgb), 0.20);
+  --alpha-light-300: rgba(var(--text-rgb), 0.28);
+  --alpha-light-400: rgba(var(--text-rgb), 0.36);
+  --alpha-light-500: rgba(var(--text-rgb), 0.48);
+  --alpha-light-600: rgba(var(--text-rgb), 0.60);
+  --alpha-light-700: rgba(var(--text-rgb), 0.70);
+  --alpha-light-900: rgba(var(--text-rgb), 0.80);
+
+  /* CTA Button gradients */
+  --gradient-cta-active: linear-gradient(to bottom, #3A9B68, #2E7D52);
+  --gradient-cta-disabled: linear-gradient(to bottom, #A7D5BA, #7BC49A);
+
+  /* Legacy — kept for progress bar, milestone, brand accent */
+  --btn-primary: #2E7D52;
+  --btn-primary-hover: #256B45;
+  --btn-disabled: #D4D4D8;
+
+  /* Alpha Dark (rgba 255,255,255) */
+  --alpha-dark-300: rgba(255, 255, 255, 0.28);
+  --alpha-dark-600: rgba(255, 255, 255, 0.60);
+  --alpha-dark-800: rgba(255, 255, 255, 0.75);
+  --alpha-dark-900: rgba(255, 255, 255, 0.80);
+
+  /* Brand */
+  --brand-rgb: 46, 125, 82;
+  --alpha-brand-50: rgba(var(--brand-rgb), 0.06);
+  --alpha-brand-100: rgba(var(--brand-rgb), 0.08);
+  --alpha-brand-200: rgba(var(--brand-rgb), 0.12);
+  --alpha-brand-950: rgba(var(--brand-rgb), 0.92);
+
+  /* Neutrals */
+  --neutral-50: #fafafa;
+  --neutral-200: #e5e5e5;
+  --neutral-300: #d4d4d4;
+  --neutral-500: #737373;
+  --neutral-700: #404040;
+
+  /* Semantic */
+  --red-600: #dc2626;
+
+  /* Shadows */
+  --shadow-card: 0px 22px 6px 0px rgba(0,0,0,0), 0px 14px 6px 0px rgba(0,0,0,0), 0px 8px 5px 0px rgba(0,0,0,0.01), 0px 4px 4px 0px rgba(0,0,0,0.02), 0px 1px 2px 0px rgba(0,0,0,0.02);
+  --shadow-dropdown: 0px 67px 19px 0px rgba(0,0,0,0), 0px 43px 17px 0px rgba(0,0,0,0.01), 0px 24px 15px 0px rgba(0,0,0,0.02), 0px 11px 11px 0px rgba(0,0,0,0.03), 0px 3px 6px 0px rgba(0,0,0,0.04);
+  --shadow-avatar: 0px 20px 6px 0px rgba(12,48,70,0), 0px 13px 5px 0px rgba(12,48,70,0.02), 0px 7px 4px 0px rgba(12,48,70,0.07), 0px 3px 3px 0px rgba(12,48,70,0.12), 0px 1px 2px 0px rgba(12,48,70,0.14);
+
+  /* Type Scale */
+  --text-2xs: 10px;
+  --text-xs: 14px;
+  --text-sm: 16px;
+  --text-base: 18px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 40px;
+
+  /* Font Weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* Line Heights */
+  --leading-tight: 1.2;
+  --leading-snug: 1.4;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.7;
+  --leading-loose: 1.8;
+}
+
+html, body {
+  background: #F6F6F7;
+  scrollbar-width: none;
+}
+::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  font-family: 'Instrument Sans', sans-serif;
+  font-variation-settings: 'wdth' 100;
+  color: var(--alpha-light-600);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+/* Global letter-spacing for body text */
+p, span, button, input, textarea, label {
+  letter-spacing: -0.15px;
+}
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.5px;
+}
+
+@keyframes slideInForward {
+  from { transform: translateX(40px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideInBack {
+  from { transform: translateX(-40px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.animate-slideInForward {
+  animation: slideInForward 200ms ease-out;
+}
+.animate-slideInBack {
+  animation: slideInBack 200ms ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+@keyframes fadeInStep {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-modal-in {
+  animation: modal-in 200ms ease-out;
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in {
+  animation: scale-in 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 300ms ease-out;
+}
+
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 200ms ease-out;
+}
+
+.thinking-dot {
+  animation: pulse-dot 1.2s infinite;
+}
+.thinking-dot:nth-child(2) { animation-delay: 150ms; }
+.thinking-dot:nth-child(3) { animation-delay: 300ms; }
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; box-shadow: 0 0 0 3px rgba(46,125,82,0.2), 0 0 8px rgba(46,125,82,0.15); }
+  50% { opacity: 1; box-shadow: 0 0 0 3px rgba(46,125,82,0.3), 0 0 8px rgba(46,125,82,0.3); }
+}
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-glow { animation: none; opacity: 1; }
+}
+
+/* Hide the Next.js dev overlay / "N issues" badge everywhere (incl. inside the
+   funnel iframes embedded by the ad stages). No-op in production. */
+nextjs-portal,
+nextjs-dev-tools-portal,
+[data-nextjs-toast],
+[data-next-badge-root],
+[data-next-badge],
+[data-nextjs-dev-indicator],
+.nextjs-toast-errors-parent,
+.nextjs-toast-errors,
+[data-nextjs-dialog-overlay] {
+  display: none !important;
+}

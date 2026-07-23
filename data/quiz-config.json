@@ -1,0 +1,794 @@
+{
+  "flow": [
+    {
+      "type": "callout",
+      "id": "welcome-callout"
+    },
+    {
+      "type": "question",
+      "id": "q1"
+    },
+    {
+      "type": "question",
+      "id": "q2"
+    },
+    {
+      "type": "question",
+      "id": "q3"
+    },
+    {
+      "type": "callout",
+      "id": "inter-1"
+    },
+    {
+      "type": "question",
+      "id": "q4"
+    },
+    {
+      "type": "question",
+      "id": "q5"
+    },
+    {
+      "type": "fitScore",
+      "id": "fit-1"
+    },
+    {
+      "type": "question",
+      "id": "q6"
+    },
+    {
+      "type": "question",
+      "id": "q7"
+    },
+    {
+      "type": "callout",
+      "id": "inter-2"
+    },
+    {
+      "type": "question",
+      "id": "q8"
+    },
+    {
+      "type": "fitScore",
+      "id": "fit-2"
+    },
+    {
+      "type": "question",
+      "id": "q9"
+    },
+    {
+      "type": "question",
+      "id": "q10"
+    },
+    {
+      "type": "question",
+      "id": "q11"
+    },
+    {
+      "type": "fitScore",
+      "id": "fit-3"
+    },
+    {
+      "type": "question",
+      "id": "q12"
+    },
+    {
+      "type": "question",
+      "id": "q13"
+    },
+    {
+      "type": "fitScore",
+      "id": "final"
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "content": "Which best describes your business?",
+      "chips": [
+        {
+          "label": "Coach / Consultant",
+          "value": "coach",
+          "emoji": "🎯",
+          "description": "1-on-1 or group advisory"
+        },
+        {
+          "label": "Service Provider",
+          "value": "service",
+          "emoji": "🏥",
+          "description": "Doctor, lawyer, accountant, etc."
+        },
+        {
+          "label": "Agency Owner",
+          "value": "agency",
+          "emoji": "🚀",
+          "description": "Marketing, design, or dev agency"
+        },
+        {
+          "label": "Course Creator",
+          "value": "course",
+          "emoji": "📚",
+          "description": "Online courses & digital products"
+        },
+        {
+          "label": "Other",
+          "value": "other",
+          "emoji": "✨",
+          "description": "Something else entirely"
+        }
+      ],
+      "preamble": "Hey! I'm Kodara AI. I help coaches, consultants, and service providers build AI products that generate revenue on autopilot. Let me assess your AI product readiness — it takes about 2 minutes.",
+      "subtitle": "Different business models benefit from different AI product strategies"
+    },
+    {
+      "id": "q2",
+      "content": "What's your current annual revenue?",
+      "chips": [
+        {
+          "label": "Under $100K",
+          "value": "under-100k",
+          "emoji": "🌱",
+          "description": "Early stage or side hustle"
+        },
+        {
+          "label": "$100K - $300K",
+          "value": "100k-300k",
+          "emoji": "📈",
+          "description": "Growing and gaining traction"
+        },
+        {
+          "label": "$300K - $1M",
+          "value": "300k-1m",
+          "emoji": "🔥",
+          "description": "Scaling fast"
+        },
+        {
+          "label": "$1M - $5M",
+          "value": "1m-5m",
+          "emoji": "⭐",
+          "description": "Established and profitable"
+        },
+        {
+          "label": "$5M+",
+          "value": "5m-plus",
+          "emoji": "💎",
+          "description": "Enterprise-level operation"
+        }
+      ],
+      "subtitle": "This helps us understand what AI product price point makes sense for your market"
+    },
+    {
+      "id": "q3",
+      "content": "What would happen to your business if you took a 2-week vacation?",
+      "chips": [
+        {
+          "label": "It runs fine without me",
+          "value": "runs-fine",
+          "emoji": "☀️",
+          "description": "Systems handle everything"
+        },
+        {
+          "label": "Things would slow down",
+          "value": "slows-down",
+          "emoji": "⚠️",
+          "description": "Team manages, but barely"
+        },
+        {
+          "label": "Everything grinds to a halt",
+          "value": "grinds-to-halt",
+          "emoji": "🚨",
+          "description": "The business IS you"
+        }
+      ],
+      "subtitle": "This reveals how dependent your business is on YOU — the #1 growth ceiling we see"
+    },
+    {
+      "id": "q4",
+      "content": "Where does most of your working time go?",
+      "chips": [
+        {
+          "label": "Selling new leads",
+          "value": "selling",
+          "emoji": "💰",
+          "description": "Calls, proposals, follow-ups"
+        },
+        {
+          "label": "Delivering for clients",
+          "value": "delivering",
+          "emoji": "🛠️",
+          "description": "Doing the actual work"
+        },
+        {
+          "label": "Creating content",
+          "value": "content",
+          "emoji": "✏️",
+          "description": "Marketing, social, emails"
+        },
+        {
+          "label": "Admin & operations",
+          "value": "admin",
+          "emoji": "📋",
+          "description": "Hiring, systems, overhead"
+        }
+      ],
+      "subtitle": "We'll use this to identify which AI product would free up the most revenue-generating hours"
+    },
+    {
+      "id": "q5",
+      "content": "What have you already created around your knowledge?",
+      "chips": [
+        {
+          "label": "Training materials / SOPs",
+          "value": "training",
+          "emoji": "📄",
+          "description": "Documented processes"
+        },
+        {
+          "label": "Books or PDFs",
+          "value": "books",
+          "emoji": "📖",
+          "description": "Written expertise"
+        },
+        {
+          "label": "Online courses",
+          "value": "courses",
+          "emoji": "🎓",
+          "description": "Video or digital programs"
+        },
+        {
+          "label": "Group coaching",
+          "value": "coaching",
+          "emoji": "👥",
+          "description": "Live group sessions"
+        },
+        {
+          "label": "Recorded calls",
+          "value": "recordings",
+          "emoji": "🎙️",
+          "description": "Workshops or meetings"
+        },
+        {
+          "label": "Deep expertise only",
+          "value": "expertise-only",
+          "emoji": "🧠",
+          "description": "No content yet, just knowledge"
+        }
+      ],
+      "subtitle": "Your existing IP is the raw material for your AI product — the more you have, the faster we can build",
+      "multiSelect": true
+    },
+    {
+      "id": "q6",
+      "content": "Which of these have you tried to scale your business?",
+      "chips": [
+        {
+          "label": "Hired employees",
+          "value": "hired",
+          "emoji": "👥",
+          "description": "Built an internal team"
+        },
+        {
+          "label": "Outsourced to agency",
+          "value": "agency",
+          "emoji": "🏢",
+          "description": "Delegated to external help"
+        },
+        {
+          "label": "Built a course",
+          "value": "course",
+          "emoji": "📚",
+          "description": "Created digital products"
+        },
+        {
+          "label": "Tried AI tools",
+          "value": "ai-tools",
+          "emoji": "🤖",
+          "description": "ChatGPT, automations, etc."
+        },
+        {
+          "label": "Group coaching",
+          "value": "group",
+          "emoji": "🗣️",
+          "description": "Leveraged 1-to-many"
+        },
+        {
+          "label": "Still looking",
+          "value": "looking",
+          "emoji": "🔍",
+          "description": "Haven't found the right fit"
+        }
+      ],
+      "subtitle": "Most business owners have tried 2-3 of these before discovering AI products",
+      "multiSelect": true
+    },
+    {
+      "id": "q7",
+      "content": "How are you using AI currently in your business?",
+      "chips": [
+        {
+          "label": "Not at all yet",
+          "value": "none",
+          "emoji": "👋",
+          "description": "Starting from zero"
+        },
+        {
+          "label": "Small tasks",
+          "value": "small-tasks",
+          "emoji": "🧩",
+          "description": "Occasional use, basic stuff"
+        },
+        {
+          "label": "Use it regularly",
+          "value": "regular",
+          "emoji": "💻",
+          "description": "Integrated into workflow"
+        },
+        {
+          "label": "All-in on AI",
+          "value": "all-in",
+          "emoji": "🚀",
+          "description": "AI-first business"
+        }
+      ],
+      "subtitle": "You don't need any AI experience — our team builds everything for you"
+    },
+    {
+      "id": "q8",
+      "content": "Which of these AI product examples sounds most like what would work for YOUR business?",
+      "chips": [
+        {
+          "label": "AI Salesperson",
+          "value": "salesperson",
+          "emoji": "💰",
+          "description": "Pre-sell clients automatically"
+        },
+        {
+          "label": "AI Service Delivery",
+          "value": "delivery",
+          "emoji": "🛠️",
+          "description": "Serve clients without you"
+        },
+        {
+          "label": "AI Operations Tool",
+          "value": "operations",
+          "emoji": "⚙️",
+          "description": "Outperform entire teams"
+        },
+        {
+          "label": "Not sure yet",
+          "value": "unsure",
+          "emoji": "🤔",
+          "description": "Show me more options"
+        }
+      ],
+      "subtitle": "These are real AI products we've built for clients"
+    },
+    {
+      "id": "q9",
+      "content": "If AI could magically take ONE thing off your plate right now, what would be the highest value?",
+      "chips": [
+        {
+          "label": "Sell without sales calls",
+          "value": "sell",
+          "emoji": "💰",
+          "description": "Close deals on autopilot"
+        },
+        {
+          "label": "Deliver without doing the work",
+          "value": "deliver",
+          "emoji": "🛠️",
+          "description": "AI handles fulfillment"
+        },
+        {
+          "label": "Reach leads without content",
+          "value": "reach",
+          "emoji": "📣",
+          "description": "Attract without the grind"
+        },
+        {
+          "label": "Onboard without hand-holding",
+          "value": "onboard",
+          "emoji": "👋",
+          "description": "Automate client setup"
+        }
+      ],
+      "subtitle": "This will determine the core function of your AI product"
+    },
+    {
+      "id": "q10",
+      "content": "What does your current sales process look like?",
+      "chips": [
+        {
+          "label": "1-on-1 sales calls",
+          "value": "calls",
+          "emoji": "📞",
+          "description": "Personal consultations"
+        },
+        {
+          "label": "1-to-many presentations",
+          "value": "webinar",
+          "emoji": "🎬",
+          "description": "Webinars, live events"
+        },
+        {
+          "label": "In-person consultation",
+          "value": "in-person",
+          "emoji": "🤝",
+          "description": "Face-to-face meetings"
+        },
+        {
+          "label": "Self-serve online",
+          "value": "self-serve",
+          "emoji": "🛒",
+          "description": "They buy without talking to you"
+        }
+      ],
+      "subtitle": "We'll design your AI product to plug into or replace parts of this"
+    },
+    {
+      "id": "q11",
+      "content": "How many touch points does it usually take to close a new client?",
+      "chips": [
+        {
+          "label": "Just 1 touch point",
+          "value": "one",
+          "emoji": "⚡",
+          "description": "Quick, simple close"
+        },
+        {
+          "label": "2-3 conversations",
+          "value": "few",
+          "emoji": "💬",
+          "description": "Some nurturing needed"
+        },
+        {
+          "label": "Many touch points",
+          "value": "many",
+          "emoji": "🔔",
+          "description": "Long sales cycle"
+        }
+      ],
+      "subtitle": "The more touch points required, the more revenue an AI product can unlock for you"
+    },
+    {
+      "id": "q12",
+      "content": "Which of these best describes your vision for the next few years?",
+      "chips": [
+        {
+          "label": "Grow without adding headcount",
+          "value": "grow-efficient",
+          "emoji": "📈",
+          "description": "Lean, efficient scaling"
+        },
+        {
+          "label": "Less time, same revenue",
+          "value": "less-time",
+          "emoji": "🏖️",
+          "description": "Work less, earn the same"
+        },
+        {
+          "label": "Build an empire",
+          "value": "empire",
+          "emoji": "👑",
+          "description": "Scale as big as possible"
+        },
+        {
+          "label": "Business runs without me",
+          "value": "without-me",
+          "emoji": "🌌",
+          "description": "True freedom"
+        }
+      ],
+      "subtitle": "Your vision determines how we architect your AI product strategy"
+    },
+    {
+      "id": "q13",
+      "content": "If your AI product was working, what would change for you?",
+      "chips": [
+        {
+          "label": "Stop trading time for money",
+          "value": "time-for-money",
+          "emoji": "⏰",
+          "description": "Break the hourly trap"
+        },
+        {
+          "label": "Scale past 7 figures",
+          "value": "scale",
+          "emoji": "📈",
+          "description": "Grow without a big team"
+        },
+        {
+          "label": "Unlimited clients",
+          "value": "unlimited",
+          "emoji": "🌟",
+          "description": "No capacity ceiling"
+        },
+        {
+          "label": "Sells while I sleep",
+          "value": "sells-while-sleep",
+          "emoji": "🌙",
+          "description": "Revenue on autopilot"
+        },
+        {
+          "label": "Business doesn't depend on me",
+          "value": "not-depend",
+          "emoji": "🔓",
+          "description": "True independence"
+        },
+        {
+          "label": "More strategy, less delivery",
+          "value": "strategy",
+          "emoji": "🧠",
+          "description": "CEO mindset, not worker"
+        }
+      ],
+      "subtitle": "Select all that apply",
+      "multiSelect": true
+    }
+  ],
+  "callouts": [
+    {
+      "id": "welcome-callout",
+      "headline": "Discover Your AI Product Opportunity",
+      "body": "Answer a few quick questions and we'll assess your AI product readiness — takes about 2 minutes.",
+      "stat": "2 min"
+    },
+    {
+      "id": "inter-1",
+      "headline": "You're not alone.",
+      "body": "87% of experts we've surveyed say their business would slow or stop without them. Kodara has helped hundreds of business owners solve this with AI products.",
+      "video": { "src": "/videos/social-proof.mp4", "title": "How Kodara clients build AI products" }
+    },
+    {
+      "id": "inter-2",
+      "headline": "Did you know?",
+      "body": "Alex Hormozi made $105M in 72 hours — a huge component was his AI product. Coaches and consultants are now selling AI products for $300-$3,000/mo that deliver their expertise automatically, 24/7.",
+      "stat": "$105M"
+    }
+  ],
+  "fitScores": [
+    {
+      "id": "fit-1",
+      "percentage": 45,
+      "message": "Your business has strong potential for an AI product. Let's keep going to increase your score.",
+      "cta": "Let's increase the fit!"
+    },
+    {
+      "id": "fit-2",
+      "percentage": 72,
+      "message": "Based on your business type and goals, you're a strong fit for an AI product.",
+      "cta": "Almost there!"
+    },
+    {
+      "id": "fit-3",
+      "percentage": 91,
+      "message": "Your business profile is almost complete. A few more questions to finalize your personalized plan.",
+      "cta": "Let's make it 100%!"
+    },
+    {
+      "id": "final",
+      "percentage": 97,
+      "message": "Your AI Product Readiness assessment is complete. Here's your personalized report.",
+      "cta": "See My Results"
+    }
+  ],
+  "actionPlan": [
+    {
+      "id": "complete-profile",
+      "title": "Complete Your Profile",
+      "type": "quick",
+      "subtitle": "Auto-completed from onboarding",
+      "initialStatus": "completed",
+      "estimatedTime": "1 min"
+    },
+    {
+      "id": "define-audience",
+      "title": "Define Your Audience",
+      "type": "guided",
+      "subtitle": "Nail down exactly who your ads should target",
+      "initialStatus": "active",
+      "estimatedTime": "3 min",
+      "messages": [
+        {
+          "id": "audience-1",
+          "sender": "ai",
+          "content": "Great choice — nailing your audience is the single most important thing you can do before running ads. Let me walk you through it."
+        },
+        {
+          "id": "audience-2",
+          "sender": "ai",
+          "video": {
+            "src": "/teaching-video.mp4",
+            "title": "Targeting 101: Finding Your Ideal Customer",
+            "duration": "2:15"
+          }
+        },
+        {
+          "id": "audience-3",
+          "sender": "ai",
+          "content": "Think about the people who already buy from you — who are they? Describe your best customer in a sentence or two.",
+          "waitForInput": true
+        },
+        {
+          "id": "audience-4",
+          "sender": "ai",
+          "content": "Here's a starter audience profile based on what you've told me. We'll refine this as we go — but this is a strong foundation for your first campaign.",
+          "visualCard": {
+            "icon": "🎯",
+            "title": "Your Audience Profile",
+            "items": [
+              {
+                "label": "Age Range",
+                "value": "28 – 45"
+              },
+              {
+                "label": "Interests",
+                "value": "Small business, entrepreneurship"
+              },
+              {
+                "label": "Pain Point",
+                "value": "Not enough leads or customers"
+              },
+              {
+                "label": "Platform",
+                "value": "Facebook & Instagram"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "create-campaign",
+      "title": "Create Your First Campaign",
+      "type": "guided",
+      "subtitle": "Build a high-converting ad step by step",
+      "initialStatus": "locked",
+      "estimatedTime": "5 min",
+      "messages": [
+        {
+          "id": "campaign-1",
+          "sender": "ai",
+          "content": "Time to build your first ad! Don't worry — I'll guide you through every piece. By the end of this step you'll have a ready-to-launch campaign structure."
+        },
+        {
+          "id": "campaign-2",
+          "sender": "ai",
+          "video": {
+            "src": "/teaching-video.mp4",
+            "title": "Anatomy of a High-Converting Ad",
+            "duration": "3:08"
+          }
+        },
+        {
+          "id": "campaign-3",
+          "sender": "ai",
+          "content": "Let's start with your headline. A great headline grabs attention in the first 2 seconds. What's the biggest benefit your customers get from working with you?",
+          "waitForInput": true
+        },
+        {
+          "id": "campaign-4",
+          "sender": "ai",
+          "content": "Love it. Now let's pair that with some ad copy. I'll draft something based on your answer — you can tweak it later.",
+          "waitForInput": true
+        },
+        {
+          "id": "campaign-5",
+          "sender": "ai",
+          "content": "Here's a mock preview of your ad. This structure is proven to convert — we'll optimize the creative once you're live.",
+          "visualCard": {
+            "icon": "📱",
+            "title": "Your Ad Preview",
+            "items": [
+              {
+                "label": "Headline",
+                "value": "Get More Customers This Month"
+              },
+              {
+                "label": "Primary Text",
+                "value": "Tired of inconsistent leads? Our proven system brings you qualified prospects every week."
+              },
+              {
+                "label": "CTA Button",
+                "value": "Learn More"
+              },
+              {
+                "label": "Placement",
+                "value": "Facebook Feed + Instagram Feed"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "set-budget",
+      "title": "Set Your Budget",
+      "type": "quick",
+      "subtitle": "Choose a daily spend that fits your goals",
+      "initialStatus": "locked",
+      "estimatedTime": "1 min"
+    },
+    {
+      "id": "expert-review",
+      "title": "Get an Expert Review",
+      "type": "offer",
+      "subtitle": "Have a strategist review your setup for free",
+      "initialStatus": "active",
+      "offerCta": "Book a Free Strategy Call",
+      "offerUrl": "#strategy-call"
+    },
+    {
+      "id": "launch-monitor",
+      "title": "Launch & Monitor",
+      "type": "guided",
+      "subtitle": "Go live and learn to read your results",
+      "initialStatus": "locked",
+      "estimatedTime": "4 min",
+      "messages": [
+        {
+          "id": "launch-1",
+          "sender": "ai",
+          "content": "Your campaign is set up — now let's talk about what happens after you hit publish. Monitoring your ads correctly is the difference between wasting money and printing it."
+        },
+        {
+          "id": "launch-2",
+          "sender": "ai",
+          "video": {
+            "src": "/teaching-video.mp4",
+            "title": "Reading Your Ad Dashboard Like a Pro",
+            "duration": "2:47"
+          }
+        },
+        {
+          "id": "launch-3",
+          "sender": "ai",
+          "content": "These are the four numbers you need to check daily for the first week. If any are off, I'll tell you exactly what to adjust.",
+          "visualCard": {
+            "icon": "📈",
+            "title": "Key Metrics to Watch",
+            "items": [
+              {
+                "label": "CPM (Cost per 1k impressions)",
+                "value": "Target: under $15"
+              },
+              {
+                "label": "CTR (Click-through rate)",
+                "value": "Target: above 1.5%"
+              },
+              {
+                "label": "CPC (Cost per click)",
+                "value": "Target: under $2"
+              },
+              {
+                "label": "CPA (Cost per acquisition)",
+                "value": "Depends on your offer"
+              }
+            ]
+          }
+        },
+        {
+          "id": "launch-4",
+          "sender": "ai",
+          "content": "Pro tip: Don't touch your ads for the first 48 hours after launch. Meta's algorithm needs time to learn who responds best. After that, we'll optimize together based on the data."
+        }
+      ]
+    },
+    {
+      "id": "dfy-setup",
+      "title": "Done-For-You Setup",
+      "type": "offer",
+      "subtitle": "Let our team build and manage your campaigns",
+      "initialStatus": "active",
+      "offerCta": "Get Started — $497",
+      "offerUrl": "#dfy-setup",
+      "offerPrice": "$497"
+    }
+  ],
+  "milestones": [
+    { "atFlowIndex": 3, "label": "Profile", "insight": "Strong foundation — you're ahead of 73% of coaches we've assessed" },
+    { "atFlowIndex": 7, "label": "Readiness", "insight": "High readiness detected — your business model is primed for AI products" },
+    { "atFlowIndex": 12, "label": "Potential", "insight": "Matched to 3 proven AI product templates for your niche" },
+    { "atFlowIndex": 19, "label": "Results" }
+  ]
+}
