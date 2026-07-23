@@ -1,12 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { nodePixelPosition } from "./CanvasRenderer";
 import { createVisualizerApp } from "./createVisualizerApp";
-import {
-  AVATAR_COUNT,
-  ICON_PER_ZONE,
-  SATELLITE_PER_ICON,
-  ZONE_COUNT,
-} from "./generateVault";
+import { HIVE_ORB_COUNT } from "./generateHive";
 
 describe("createVisualizerApp", () => {
   it("maps recording keyboard shortcuts", () => {
@@ -69,11 +64,7 @@ describe("createVisualizerApp", () => {
       }),
     });
 
-    const iconCount = ZONE_COUNT * ICON_PER_ZONE;
-    const satelliteCount = iconCount * SATELLITE_PER_ICON;
-    expect(renderCalls[0]).toBeGreaterThanOrEqual(
-      1 + ZONE_COUNT + iconCount + satelliteCount + AVATAR_COUNT + 80,
-    );
+    expect(renderCalls[0]).toBe(1 + HIVE_ORB_COUNT); // brain + 28 orbs
     app.destroy();
     root.remove();
   });
@@ -139,7 +130,7 @@ describe("createVisualizerApp", () => {
     });
 
     const leads = app.getLeadNodes();
-    expect(leads.length).toBe(96);
+    expect(leads.length).toBe(HIVE_ORB_COUNT);
 
     expect(app.getFocusScreenPosition()).toBeUndefined();
 

@@ -1,6 +1,7 @@
 import { render, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { LatticeCanvas } from './LatticeCanvas';
+import { HIVE_ORB_COUNT } from '@/lib/lattice/generateHive';
 
 // jsdom has no canvas implementation, so `new CanvasRenderer(canvas)` throws
 // and createVisualizerApp falls back to its fatal-path stub, whose
@@ -18,7 +19,7 @@ describe('LatticeCanvas', () => {
 
     const app = onReady.mock.calls[0]![0];
     expect(typeof app.focusNode).toBe('function');
-    expect(app.getLeadNodes()).toHaveLength(96);
+    expect(app.getLeadNodes()).toHaveLength(HIVE_ORB_COUNT);
 
     unmount();
   });

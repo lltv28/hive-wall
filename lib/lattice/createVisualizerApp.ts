@@ -1,5 +1,5 @@
 import { normalizeSettings, VAULT_PRESET, type VisualSettings } from "./settings";
-import { generateVault } from "./generateVault";
+import { generateHive } from "./generateHive";
 import { buildGrowthSchedule, type GrowthBatch } from "./growthSchedule";
 import type { WheelGraph, WheelNode } from "./types";
 import {
@@ -31,15 +31,6 @@ type Renderer = Pick<CanvasRenderer, "render" | "resize">;
 export interface VisualizerDependencies {
   rendererFactory?: (canvas: HTMLCanvasElement) => Renderer;
   onAction?: (action: VaultAction) => void;
-}
-
-function randomSeed(): number {
-  const buffer = new Uint32Array(1);
-  if (typeof crypto !== "undefined" && crypto.getRandomValues) {
-    crypto.getRandomValues(buffer);
-    return buffer[0] ?? Date.now();
-  }
-  return Math.floor(Math.random() * 0xffffffff);
 }
 
 export function createVisualizerApp(
@@ -142,12 +133,7 @@ export function createVisualizerApp(
   }
 
   function startGraph(): void {
-    const seed = randomSeed();
-    const targetGraph = generateVault({
-      nodeCount: settings.nodeCount,
-      linkDensity: settings.linkDensity,
-      seed,
-    });
+    const targetGraph = generateHive();
     graph = targetGraph;
     focusedNodeId = undefined;
     camera = identityCamera(canvas.width, canvas.height);
