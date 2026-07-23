@@ -24,6 +24,14 @@ const PULSE_MS = 850;
 // (they are representative, not a literal count).
 const BRAIN_CHATS_LABEL = "50";
 
+// ctx.letterSpacing exists in modern Chrome but not on jsdom's fake test
+// contexts (and older canvases); guard so tests don't throw and it degrades.
+function setLetterSpacing(ctx: CanvasRenderingContext2D, value: string): void {
+  if ("letterSpacing" in ctx) {
+    (ctx as unknown as { letterSpacing: string }).letterSpacing = value;
+  }
+}
+
 export interface HiveFrame {
   timeMs: number;
   revenue: number;
@@ -290,18 +298,21 @@ export class CanvasRenderer {
     const bump = recent > 0 && recent <= 1 ? 1 + 0.05 * recent : 1;
     const r = node.radius * bump;
 
-    // Body: bright top-left highlight, mostly green, dark only near the very
-    // rim. The CSS original reached its dark stop only at the box corners, so
-    // the visible sphere stayed bright — emulated here by pushing the dark stop
-    // out to 0.92 rather than the circle edge.
-    const grad = ctx.createRadialGradient(
-      pos.x - r * 0.35, pos.y - r * 0.4, r * 0.05, pos.x, pos.y, r,
-    );
-    grad.addColorStop(0, "#6ef29a");
-    grad.addColorStop(0.35, "#4ade80");
-    grad.addColorStop(0.72, "#166534");
+    // Body — matches the original CSS exactly:
+    //   radial-gradient(circle at 30% 30%, #4ade80 0%, #166534 60%, #064e3b 100%)
+    // A CSS radial gradient reaches its final stop at the farthest box CORNER,
+    // so #064e3b only appears in a small bottom-right crescent and the sphere
+    // stays mostly bright green. Reproduce that by centring the gradient at the
+    // 30%/30% point (0.4r up-left of centre) with an outer radius of ~1.5r
+    // (past the circle), NOT ending #064e3b at the visible rim.
+    const family = this.brainFontFamily();
+    const hx = pos.x - r * 0.4;
+    const hy = pos.y - r * 0.4;
+    const grad = ctx.createRadialGradient(hx, hy, r * 0.05, hx, hy, r * 1.5);
+    grad.addColorStop(0, "#4ade80");
+    grad.addColorStop(0.6, "#166534");
     grad.addColorStop(1, "#064e3b");
-    ctx.shadowColor = "rgba(74,222,128,0.45)";
+    ctx.shadowColor = "rgba(74,222,128,0.4)";
     ctx.shadowBlur = 64;
     ctx.fillStyle = grad;
     ctx.beginPath();
@@ -309,40 +320,51 @@ export class CanvasRenderer {
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    // Inset gloss: a soft white sheen hugging the top-inside of the sphere,
-    // clipped to the circle (mimics the original's `inset 0 4px 16px
-    // rgba(255,255,255,0.4)` glossy highlight).
+    // Inset sheen — the original's `inset 0 4px 16px rgba(255,255,255,0.4)` is a
+    // SUBTLE soft-white glow hugging the top inner rim, not a broad wash. Keep it
+    // concentrated near the top edge and low-alpha, clipped to the sphere.
     ctx.save();
     ctx.beginPath();
     ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
     ctx.clip();
-    const gloss = ctx.createRadialGradient(
-      pos.x, pos.y - r * 0.6, r * 0.05, pos.x, pos.y - r * 0.6, r * 0.95,
+    const sheen = ctx.createRadialGradient(
+      pos.x, pos.y - r * 0.82, r * 0.02, pos.x, pos.y - r * 0.82, r * 0.7,
     );
-    gloss.addColorStop(0, "rgba(255,255,255,0.42)");
-    gloss.addColorStop(0.5, "rgba(255,255,255,0.10)");
-    gloss.addColorStop(1, "rgba(255,255,255,0)");
-    ctx.fillStyle = gloss;
+    sheen.addColorStop(0, "rgba(255,255,255,0.32)");
+    sheen.addColorStop(0.6, "rgba(255,255,255,0.05)");
+    sheen.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = sheen;
     ctx.fillRect(pos.x - r, pos.y - r, r * 2, r * 2);
     ctx.restore();
 
+    // Text — the page's Instrument Sans (read from the canvas's computed style),
+    // at the original weights: caption 700 + letter-spacing, revenue 700 with a
+    // drop shadow, pill 700.
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = PALETTE.brainCaption;
-    ctx.font = "600 18px Inter, ui-sans-serif, system-ui, sans-serif";
-    ctx.fillText("TOTAL REVENUE", pos.x, pos.y - 52);
-    ctx.fillStyle = PALETTE.brainText;
-    ctx.font = "600 68px Inter, ui-sans-serif, system-ui, sans-serif";
-    ctx.fillText(`$${Math.round(frame.revenue).toLocaleString()}`, pos.x, pos.y + 4);
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.font = `700 16px ${family}`;
+    setLetterSpacing(ctx, "1.5px");
+    ctx.fillText("TOTAL REVENUE", pos.x, pos.y - 50);
+    setLetterSpacing(ctx, "0px");
+
+    ctx.save();
+    ctx.shadowColor = "rgba(0,0,0,0.3)";
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetY = 4;
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `700 64px ${family}`;
+    ctx.fillText(`$${Math.round(frame.revenue).toLocaleString()}`, pos.x, pos.y + 2);
+    ctx.restore();
 
     // "1 AI Brain • N Chats" pill (rounded chip + border), matching the original
     // ad. BRAIN_CHATS_LABEL is a marketing figure, not the visible orb count.
     const label = `1 AI Brain • ${BRAIN_CHATS_LABEL} Chats`;
-    ctx.font = "600 15px Inter, ui-sans-serif, system-ui, sans-serif";
-    const pillH = 30;
-    const pillW = ctx.measureText(label).width + 32;
+    ctx.font = `700 13px ${family}`;
+    const pillH = 28;
+    const pillW = ctx.measureText(label).width + 30;
     const pillX = pos.x - pillW / 2;
-    const pillY = pos.y + 40;
+    const pillY = pos.y + 38;
     ctx.beginPath();
     if (typeof ctx.roundRect === "function") {
       ctx.roundRect(pillX, pillY, pillW, pillH, pillH / 2);
@@ -352,10 +374,29 @@ export class CanvasRenderer {
     ctx.fillStyle = "rgba(0,0,0,0.3)";
     ctx.fill();
     ctx.lineWidth = 1;
-    ctx.strokeStyle = "rgba(255,255,255,0.25)";
+    ctx.strokeStyle = "rgba(255,255,255,0.2)";
     ctx.stroke();
     ctx.fillStyle = "#ffffff";
     ctx.fillText(label, pos.x, pillY + pillH / 2 + 1);
+  }
+
+  // The page font is Instrument Sans, loaded via next/font under a hashed
+  // family name — so the literal string 'Instrument Sans' does NOT resolve on
+  // the canvas. Read the actual computed family off the canvas element (it
+  // inherits the body font) so the brain text matches the rest of the demo
+  // instead of falling back to a system face. Cached; falls back if unavailable.
+  private cachedFontFamily?: string;
+  private brainFontFamily(): string {
+    if (this.cachedFontFamily) return this.cachedFontFamily;
+    let family = "";
+    try {
+      family = getComputedStyle(this.canvas).fontFamily;
+    } catch {
+      family = "";
+    }
+    this.cachedFontFamily =
+      family || "'Instrument Sans', ui-sans-serif, system-ui, sans-serif";
+    return this.cachedFontFamily;
   }
 
   resize(width: number, height: number): void {
