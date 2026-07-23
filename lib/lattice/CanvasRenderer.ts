@@ -24,6 +24,13 @@ const PULSE_MS = 850;
 // (they are representative, not a literal count).
 const BRAIN_CHATS_LABEL = "50";
 
+// The brain is DRAWN this much larger than its node.radius. node.radius stays
+// the click hit-target (kept ≤160 so the renderer test's 300×150 jsdom canvas
+// still has a point outside every node); the visual size is decoupled from it
+// so the brain can be enlarged without re-breaking that test. Scales the sphere
+// AND its text/pill together.
+const BRAIN_DRAW_SCALE = 1.4;
+
 // ctx.letterSpacing exists in modern Chrome but not on jsdom's fake test
 // contexts (and older canvases); guard so tests don't throw and it degrades.
 function setLetterSpacing(ctx: CanvasRenderingContext2D, value: string): void {
@@ -316,7 +323,10 @@ export class CanvasRenderer {
       0,
     );
     const bump = recent > 0 && recent <= 1 ? 1 + 0.05 * recent : 1;
-    const r = node.radius * bump;
+    // ts scales the whole brain (sphere + text + pill). node.radius is the hit
+    // target; BRAIN_DRAW_SCALE enlarges only the drawing (see its comment).
+    const ts = BRAIN_DRAW_SCALE * bump;
+    const r = node.radius * ts;
 
     // Body — matches the original CSS exactly:
     //   radial-gradient(circle at 30% 30%, #4ade80 0%, #166534 60%, #064e3b 100%)
@@ -363,28 +373,28 @@ export class CanvasRenderer {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "rgba(255,255,255,0.9)";
-    ctx.font = `700 16px ${family}`;
-    setLetterSpacing(ctx, "1.5px");
-    ctx.fillText("TOTAL REVENUE", pos.x, pos.y - 50);
+    ctx.font = `700 ${16 * ts}px ${family}`;
+    setLetterSpacing(ctx, `${1.5 * ts}px`);
+    ctx.fillText("TOTAL REVENUE", pos.x, pos.y - 50 * ts);
     setLetterSpacing(ctx, "0px");
 
     ctx.save();
     ctx.shadowColor = "rgba(0,0,0,0.3)";
-    ctx.shadowBlur = 12;
-    ctx.shadowOffsetY = 4;
+    ctx.shadowBlur = 12 * ts;
+    ctx.shadowOffsetY = 4 * ts;
     ctx.fillStyle = "#ffffff";
-    ctx.font = `700 64px ${family}`;
-    ctx.fillText(`$${Math.round(frame.revenue).toLocaleString()}`, pos.x, pos.y + 2);
+    ctx.font = `700 ${64 * ts}px ${family}`;
+    ctx.fillText(`$${Math.round(frame.revenue).toLocaleString()}`, pos.x, pos.y + 2 * ts);
     ctx.restore();
 
     // "1 AI Brain • N Chats" pill (rounded chip + border), matching the original
     // ad. BRAIN_CHATS_LABEL is a marketing figure, not the visible orb count.
     const label = `1 AI Brain • ${BRAIN_CHATS_LABEL} Chats`;
-    ctx.font = `700 13px ${family}`;
-    const pillH = 28;
-    const pillW = ctx.measureText(label).width + 30;
+    ctx.font = `700 ${13 * ts}px ${family}`;
+    const pillH = 28 * ts;
+    const pillW = ctx.measureText(label).width + 30 * ts;
     const pillX = pos.x - pillW / 2;
-    const pillY = pos.y + 38;
+    const pillY = pos.y + 38 * ts;
     ctx.beginPath();
     if (typeof ctx.roundRect === "function") {
       ctx.roundRect(pillX, pillY, pillW, pillH, pillH / 2);
