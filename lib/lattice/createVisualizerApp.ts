@@ -130,7 +130,12 @@ export function createVisualizerApp(
     if (focusedNode) {
       return asideCamera(canvas.width, canvas.height, focusSideFor(focusedNode));
     }
-    return identityCamera(canvas.width, canvas.height);
+    // Wide view: the orbs live only on the right, so pan the composition left of
+    // centre — the brain sits ~40% in and the six orbs fan into the middle,
+    // rather than a lopsided brain-dead-centre with everything to one side. The
+    // world centre (where the brain lives) maps to screen x = width - lookAtX =
+    // 0.4*width. Drills still hand off to asideCamera.
+    return { scale: 1, lookAtX: canvas.width * 0.6, lookAtY: canvas.height / 2 };
   }
 
   function renderNow(): void {

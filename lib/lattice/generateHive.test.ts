@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateHive, HIVE_ORB_COUNT, HIVE_PER_SIDE } from "./generateHive";
+import { generateHive, HIVE_ORB_COUNT } from "./generateHive";
 import { nodePixelPosition } from "./CanvasRenderer";
 
 describe("generateHive", () => {
@@ -21,13 +21,11 @@ describe("generateHive", () => {
     expect(orbs.every((o) => !!o.initials)).toBe(true);
   });
 
-  it("splits orbs into a left arc and a right arc of equal size", () => {
+  it("places every orb on the right side of the brain", () => {
     const orbs = generateHive().nodes.filter((n) => n.ring === "avatar");
     const w = 1440, h = 1000;
     const right = orbs.filter((o) => nodePixelPosition(o, w, h).x >= w / 2);
-    const left = orbs.filter((o) => nodePixelPosition(o, w, h).x < w / 2);
-    expect(right).toHaveLength(HIVE_PER_SIDE);
-    expect(left).toHaveLength(HIVE_PER_SIDE);
+    expect(right).toHaveLength(HIVE_ORB_COUNT);
   });
 
   it("spreads orbs across at least 3 drill zones so selectDrillNodes can pick 3", () => {

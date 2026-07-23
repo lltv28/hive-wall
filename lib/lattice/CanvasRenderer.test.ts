@@ -241,6 +241,8 @@ describe("closed-state fill", () => {
         fillCalls.push(ctx.fillStyle as string);
       },
       createRadialGradient: () => ({ addColorStop: () => {} }),
+      clip: () => {},
+      measureText: () => ({ width: 0 }),
       setLineDash: () => {},
       lineDashOffset: 0,
       lineCap: "butt",
@@ -315,6 +317,8 @@ describe("focus dimming", () => {
       fillText: () => {},
       fill: () => {},
       createRadialGradient: () => ({ addColorStop: () => {} }),
+      clip: () => {},
+      measureText: () => ({ width: 0 }),
       setLineDash: () => {},
       lineDashOffset: 0,
       lineCap: "butt",

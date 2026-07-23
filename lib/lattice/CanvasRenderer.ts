@@ -1,6 +1,5 @@
 import type { WheelGraph, WheelNode } from "./types";
 import { polarToCartesian, wheelRadiusFor } from "./wheelLayout";
-import { HIVE_ORB_COUNT } from "./generateHive";
 
 const PALETTE = {
   stageInner: "#1e293b",
@@ -19,6 +18,11 @@ const PALETTE = {
 };
 
 const PULSE_MS = 850;
+
+// Marketing figure shown in the brain's "N Chats" pill — matches the original
+// Hive ad's copy, deliberately decoupled from the handful of orbs on screen
+// (they are representative, not a literal count).
+const BRAIN_CHATS_LABEL = "50";
 
 export interface HiveFrame {
   timeMs: number;
@@ -286,31 +290,72 @@ export class CanvasRenderer {
     const bump = recent > 0 && recent <= 1 ? 1 + 0.05 * recent : 1;
     const r = node.radius * bump;
 
+    // Body: bright top-left highlight, mostly green, dark only near the very
+    // rim. The CSS original reached its dark stop only at the box corners, so
+    // the visible sphere stayed bright — emulated here by pushing the dark stop
+    // out to 0.92 rather than the circle edge.
     const grad = ctx.createRadialGradient(
-      pos.x - r * 0.3, pos.y - r * 0.3, r * 0.1, pos.x, pos.y, r,
+      pos.x - r * 0.35, pos.y - r * 0.4, r * 0.05, pos.x, pos.y, r,
     );
-    grad.addColorStop(0, "#4ade80");
-    grad.addColorStop(0.6, "#166534");
+    grad.addColorStop(0, "#6ef29a");
+    grad.addColorStop(0.35, "#4ade80");
+    grad.addColorStop(0.72, "#166534");
     grad.addColorStop(1, "#064e3b");
     ctx.shadowColor = "rgba(74,222,128,0.45)";
-    ctx.shadowBlur = 60;
+    ctx.shadowBlur = 64;
     ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
     ctx.fill();
     ctx.shadowBlur = 0;
 
+    // Inset gloss: a soft white sheen hugging the top-inside of the sphere,
+    // clipped to the circle (mimics the original's `inset 0 4px 16px
+    // rgba(255,255,255,0.4)` glossy highlight).
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
+    ctx.clip();
+    const gloss = ctx.createRadialGradient(
+      pos.x, pos.y - r * 0.6, r * 0.05, pos.x, pos.y - r * 0.6, r * 0.95,
+    );
+    gloss.addColorStop(0, "rgba(255,255,255,0.42)");
+    gloss.addColorStop(0.5, "rgba(255,255,255,0.10)");
+    gloss.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = gloss;
+    ctx.fillRect(pos.x - r, pos.y - r, r * 2, r * 2);
+    ctx.restore();
+
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = PALETTE.brainCaption;
     ctx.font = "600 18px Inter, ui-sans-serif, system-ui, sans-serif";
-    ctx.fillText("TOTAL REVENUE", pos.x, pos.y - 46);
+    ctx.fillText("TOTAL REVENUE", pos.x, pos.y - 52);
     ctx.fillStyle = PALETTE.brainText;
-    ctx.font = "600 64px Inter, ui-sans-serif, system-ui, sans-serif";
-    ctx.fillText(`$${Math.round(frame.revenue).toLocaleString()}`, pos.x, pos.y + 6);
-    ctx.fillStyle = PALETTE.brainCaption;
+    ctx.font = "600 68px Inter, ui-sans-serif, system-ui, sans-serif";
+    ctx.fillText(`$${Math.round(frame.revenue).toLocaleString()}`, pos.x, pos.y + 4);
+
+    // "1 AI Brain • N Chats" pill (rounded chip + border), matching the original
+    // ad. BRAIN_CHATS_LABEL is a marketing figure, not the visible orb count.
+    const label = `1 AI Brain • ${BRAIN_CHATS_LABEL} Chats`;
     ctx.font = "600 15px Inter, ui-sans-serif, system-ui, sans-serif";
-    ctx.fillText(`1 AI Brain • ${HIVE_ORB_COUNT} Chats`, pos.x, pos.y + 54);
+    const pillH = 30;
+    const pillW = ctx.measureText(label).width + 32;
+    const pillX = pos.x - pillW / 2;
+    const pillY = pos.y + 40;
+    ctx.beginPath();
+    if (typeof ctx.roundRect === "function") {
+      ctx.roundRect(pillX, pillY, pillW, pillH, pillH / 2);
+    } else {
+      ctx.rect(pillX, pillY, pillW, pillH);
+    }
+    ctx.fillStyle = "rgba(0,0,0,0.3)";
+    ctx.fill();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(255,255,255,0.25)";
+    ctx.stroke();
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(label, pos.x, pillY + pillH / 2 + 1);
   }
 
   resize(width: number, height: number): void {
