@@ -12,6 +12,7 @@ import {
   STAGE_H,
   STAGE_W,
   UPSELL_PCT,
+  useCountUp,
   useFitStage,
   useLiveTally,
   useRealTileOutcomes,
@@ -76,6 +77,10 @@ export default function LatticePage() {
   const handleReady = useCallback((ready: VisualizerApp) => setApp(ready), []);
 
   const tour = useTourDriver(app);
+  const shownRevenue = useCountUp(tally.revenue);
+  useEffect(() => {
+    app?.setBrainRevenue(shownRevenue);
+  }, [app, shownRevenue]);
   const outcomes = useRealTileOutcomes();
   const identities = useMemo(() => buildLeadIdentities(), []);
 

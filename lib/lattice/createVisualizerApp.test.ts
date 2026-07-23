@@ -221,6 +221,25 @@ describe("createVisualizerApp", () => {
     app.destroy();
   });
 
+  it("exposes setBrainRevenue on the real app and the fatal-path stub", () => {
+    const root = document.createElement("div");
+    const app = createVisualizerApp(root, {
+      rendererFactory: () => ({ render: vi.fn(), resize: vi.fn() }),
+    });
+    expect(typeof app.setBrainRevenue).toBe("function");
+    app.setBrainRevenue(1234); // must not throw
+    app.destroy();
+
+    const stub = createVisualizerApp(document.createElement("div"), {
+      rendererFactory: () => {
+        throw new Error("no canvas");
+      },
+    });
+    expect(typeof stub.setBrainRevenue).toBe("function");
+    stub.setBrainRevenue(1); // must not throw
+    stub.destroy();
+  });
+
   it("marks a lead node closed", () => {
     const root = document.createElement("div");
     const app = createVisualizerApp(root, {

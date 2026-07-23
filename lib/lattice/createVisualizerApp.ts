@@ -25,6 +25,7 @@ export interface VisualizerApp {
   getFocusedLeadId(): number | undefined;
   getLeadNodes(): WheelNode[];
   markClosed(nodeId: string): void;
+  setBrainRevenue(value: number): void;
 }
 
 type Renderer = Pick<CanvasRenderer, "render" | "resize">;
@@ -56,7 +57,6 @@ export function createVisualizerApp(
   // zooming out, and panning directly between two focused nodes are all just
   // "ease toward the current target", with no separate instant-snap cases.
   let camera: Camera = identityCamera(1, 1);
-  // eslint-disable-next-line prefer-const -- Task 4 adds setBrainRevenue, which reassigns this.
   let brainRevenue = 0;
   let pulses: { nodeId: string; startMs: number }[] = [];
 
@@ -87,6 +87,7 @@ export function createVisualizerApp(
         return [];
       },
       markClosed(): void {},
+      setBrainRevenue(): void {},
     };
   }
   renderer.resize(initialWidth, initialHeight);
@@ -356,6 +357,10 @@ export function createVisualizerApp(
     renderNow();
   }
 
+  function setBrainRevenue(value: number): void {
+    brainRevenue = value;
+  }
+
   return {
     destroy(): void {
       cancelAnimationFrame(animationFrame);
@@ -369,5 +374,6 @@ export function createVisualizerApp(
     getFocusedLeadId,
     getLeadNodes,
     markClosed,
+    setBrainRevenue,
   };
 }
