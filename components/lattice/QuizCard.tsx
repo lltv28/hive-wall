@@ -14,6 +14,12 @@ export const CARD_SIZE = { width: 420, height: 560 };
 const CONNECTOR_COLOR = 'rgba(190, 255, 215, 0.7)';
 const CONNECTOR_GLOW = 'rgba(74, 222, 128, 0.3)';
 const CONNECTOR_DOT_RADIUS = 4;
+// The line + its dot start at the focused orb's EDGE, not its centre, so the
+// connector never paints in front of the orb. The orb lives on the opaque
+// canvas below this SVG, so it can't be layered behind via z-index — offsetting
+// the start clear of the orb is the equivalent. ~18px = the orb's screen radius
+// (ORB_RADIUS_PX at the drill camera's scale of 1).
+const CONNECTOR_ORB_CLEARANCE = 18;
 
 const IDENTITIES = buildLeadIdentities();
 // speed: 3. Nearly every step of the quiz flow gates on waitingForInput, so
@@ -108,6 +114,21 @@ export function QuizCard({
       )
     : placement.y + CARD_SIZE.height / 2;
 
+  // Start the connector at the orb's edge (offset toward the card) rather than
+  // its centre, so the line and its dot sit just outside the focused orb instead
+  // of painting over it.
+  const connectorStart = nodePosition
+    ? (() => {
+        const dx = cardEdgeX - nodePosition.x;
+        const dy = cardEdgeY - nodePosition.y;
+        const len = Math.hypot(dx, dy) || 1;
+        return {
+          x: nodePosition.x + (dx / len) * CONNECTOR_ORB_CLEARANCE,
+          y: nodePosition.y + (dy / len) * CONNECTOR_ORB_CLEARANCE,
+        };
+      })()
+    : undefined;
+
   return (
     <>
       {/* The card is kept as the first child (z-index alone controls the
@@ -162,7 +183,7 @@ export function QuizCard({
           />
         ))}
       </div>
-      {nodePosition && (
+      {connectorStart && (
         <svg
           style={{
             position: 'absolute',
@@ -176,8 +197,8 @@ export function QuizCard({
           }}
         >
           <line
-            x1={nodePosition.x}
-            y1={nodePosition.y}
+            x1={connectorStart.x}
+            y1={connectorStart.y}
             x2={cardEdgeX}
             y2={cardEdgeY}
             stroke={CONNECTOR_GLOW}
@@ -185,8 +206,8 @@ export function QuizCard({
             strokeLinecap="round"
           />
           <line
-            x1={nodePosition.x}
-            y1={nodePosition.y}
+            x1={connectorStart.x}
+            y1={connectorStart.y}
             x2={cardEdgeX}
             y2={cardEdgeY}
             stroke={CONNECTOR_COLOR}
@@ -194,14 +215,14 @@ export function QuizCard({
             strokeLinecap="round"
           />
           <circle
-            cx={nodePosition.x}
-            cy={nodePosition.y}
+            cx={connectorStart.x}
+            cy={connectorStart.y}
             r={CONNECTOR_DOT_RADIUS + 3}
             fill={CONNECTOR_GLOW}
           />
           <circle
-            cx={nodePosition.x}
-            cy={nodePosition.y}
+            cx={connectorStart.x}
+            cy={connectorStart.y}
             r={CONNECTOR_DOT_RADIUS}
             fill={CONNECTOR_COLOR}
           />
